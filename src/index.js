@@ -1,6 +1,7 @@
 const express = require('express');
 
 const talkerRoutes = require('./routes/talkerRoutes');
+const loginRoutes = require('./routes/loginRoutes');
 const errorHandler = require('./middlewares/error');
 
 const app = express();
@@ -15,6 +16,7 @@ app.get('/', (_request, response) => {
 });
 
 app.use('/talker', talkerRoutes);
+app.use('/login', loginRoutes);
 app.use(errorHandler);
 
 app.listen(PORT, () => {

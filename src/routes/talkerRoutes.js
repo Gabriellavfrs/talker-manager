@@ -3,15 +3,15 @@ const express = require('express');
 const fs = require('fs/promises');
 const utilsFile = require('../utils');
 
-const route = express.Router();
+const router = express.Router();
 
-route.get('/', async (req, res) => {
+router.get('/', async (req, res) => {
   const talkersArray = await fs.readFile('src/talker.json', 'utf8');
 
   res.status(200).json(JSON.parse(talkersArray));
 });
 
-route.get('/:id', async (req, res, next) => {
+router.get('/:id', async (req, res, next) => {
   const { id } = req.params;
   const talkersArray = await utilsFile.readTalkerFile();
   const talker = talkersArray.find((t) => t.id === Number(id));
@@ -21,4 +21,4 @@ route.get('/:id', async (req, res, next) => {
   res.status(200).json(talker);
 });
 
-module.exports = route;
+module.exports = router;
