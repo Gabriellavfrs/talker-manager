@@ -1,6 +1,5 @@
 const express = require('express');
 
-const fs = require('fs/promises');
 const utilsFile = require('../utils');
 
 const router = express.Router();
@@ -10,10 +9,19 @@ const {
   postBodyValidation,
 } = require('../middlewares/validations');
 
-router.get('/', async (req, res) => {
-  const talkersArray = await fs.readFile('src/talker.json', 'utf8');
+router.get('/search', postHeaderValidation, async (req, res) => {
+  const { q } = req.query;
+  const talkersArray = await utilsFile.readTalkerFile();
+  if (!q) {
+    return res.status(200).json(talkersArray);
+  }
+  const filteredTalkers = talkersArray.filter(({ name }) => name.includes(q));
+  res.status(200).json(filteredTalkers);
+});
 
-  res.status(200).json(JSON.parse(talkersArray));
+router.get('/', async (req, res) => {
+  const talkersArray = await utilsFile.readTalkerFile();
+  res.status(200).json(talkersArray);
 });
 
 router.get('/:id', async (req, res, next) => {
