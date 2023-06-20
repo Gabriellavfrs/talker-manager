@@ -4,7 +4,7 @@ const emailValidation = (req, _res, next) => {
   if (!email) {
     return next({ statusCode: 400, message: 'O campo "email" é obrigatório' });
   }
-  if (email && !(regex.test(email))) {
+  if (!regex.test(email)) {
     return next({ statusCode: 400, message: 'O "email" deve ter o formato "email@email.com"' });
   }
   next();
@@ -40,7 +40,6 @@ const postNameValidation = (req, _res, next) => {
   if (name.length < 3) {
     return next({ statusCode: 400, message: 'O "name" deve ter pelo menos 3 caracteres' });
   }
-  next();
 };
 
 const postAgeValidation = (req, _res, next) => {
@@ -54,7 +53,33 @@ const postAgeValidation = (req, _res, next) => {
       message: 'O campo "age" deve ser um número inteiro igual ou maior que 18', 
     });
   }
-  next();
+};
+
+const postWatchedValidation = (req, _res, next) => {
+  const { watchedAt } = req.body.talk;
+  const dateFormat = /^\d{2}\/\d{2}\/\d{4}$/;
+  if (!watchedAt) {
+    return next({ statusCode: 400, message: 'O campo "watchedAt" é obrigatório' });
+  }
+  if (!dateFormat.test(watchedAt)) {
+    return next({ 
+      statusCode: 400, 
+      message: 'O campo "watchedAt" deve ter o formato "dd/mm/aaaa"', 
+    });
+  }
+};
+
+const postRateValidation = (req, _res, next) => {
+  const { rate } = req.body.talk;
+  if (rate === undefined) {
+    return next({ statusCode: 400, message: 'O campo "rate" é obrigatório' });
+  }
+  if (!Number.isInteger(rate) || rate < 1 || rate > 5) {
+    return next({ 
+      statusCode: 400, 
+      message: 'O campo "rate" deve ser um número inteiro entre 1 e 5', 
+    });
+  }
 };
 
 const postTalkValidation = (req, _res, next) => {
@@ -62,6 +87,14 @@ const postTalkValidation = (req, _res, next) => {
   if (!talk) {
     return next({ statusCode: 400, message: 'O campo "talk" é obrigatório' });
   }
+  postWatchedValidation(req, _res, next);
+  postRateValidation(req, _res, next);
+};
+
+const postBodyValidation = (req, _res, next) => {
+  postNameValidation(req, _res, next);
+  postAgeValidation(req, _res, next);
+  postTalkValidation(req, _res, next);
   next();
 };
 
@@ -69,6 +102,5 @@ module.exports = {
   emailValidation,
   passwordValidation,
   postHeaderValidation,
-  postNameValidation,
-  postAgeValidation,
+  postBodyValidation,
 };

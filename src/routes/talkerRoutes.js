@@ -7,8 +7,7 @@ const router = express.Router();
 
 const {   
   postHeaderValidation,
-  postNameValidation,
-  postAgeValidation,
+  postBodyValidation,
 } = require('../middlewares/validations');
 
 router.get('/', async (req, res) => {
@@ -27,9 +26,15 @@ router.get('/:id', async (req, res, next) => {
   res.status(200).json(talker);
 });
 
-router.post('/', postHeaderValidation, postNameValidation, postAgeValidation, async (req, res) => {
+router.post('/', postHeaderValidation,
+postBodyValidation, async (req, res) => {
   const lastId = await utilsFile.gettLastId();
-  res.status(201).json((req.body));
+  const newTalker = {
+    id: lastId + 1,
+    ...req.body,
+  };
+  await utilsFile.insertTalker(newTalker);
+  res.status(201).json((newTalker));
 });
 
 module.exports = router;
