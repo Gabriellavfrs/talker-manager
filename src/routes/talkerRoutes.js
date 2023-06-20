@@ -51,4 +51,10 @@ router.put('/:id', postHeaderValidation, postBodyValidation, async (req, res, ne
   res.status(200).json((editedTalker));
 });
 
+router.delete('/:id', postHeaderValidation, async (req, res) => {
+  const { id } = req.params;
+  await utilsFile.deleteTalker(Number(id));
+  res.sendStatus(204);
+});
+
 module.exports = router;

@@ -24,9 +24,16 @@ const editTalker = async (editedTalker) => {
   return fs.writeFile('src/talker.json', JSON.stringify(talkersArray));
 };
 
+const deleteTalker = async (id) => {
+  const talkersArray = await readTalkerFile();
+  const newTalkersArray = talkersArray.filter((t) => t.id !== id);
+  return fs.writeFile('src/talker.json', JSON.stringify(newTalkersArray));
+};
+
 module.exports = {
   readTalkerFile,
   gettLastId,
   insertTalker,
   editTalker,
+  deleteTalker,
 };
