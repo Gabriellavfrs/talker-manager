@@ -21,7 +21,7 @@ const passwordValidation = (req, _res, next) => {
   next();
 };
 
-const postHeaderValidation = (req, _res, next) => {
+const headerValidation = (req, _res, next) => {
   const { authorization } = req.headers;
   if (!authorization) {
     return next({ statusCode: 401, message: 'Token não encontrado' });
@@ -32,7 +32,7 @@ const postHeaderValidation = (req, _res, next) => {
   next();
 };
 
-const postNameValidation = (req, _res, next) => {
+const nameValidation = (req, _res, next) => {
   const { name } = req.body;
   if (!name) {
     return next({ statusCode: 400, message: 'O campo "name" é obrigatório' });
@@ -42,7 +42,7 @@ const postNameValidation = (req, _res, next) => {
   }
 };
 
-const postAgeValidation = (req, _res, next) => {
+const ageValidation = (req, _res, next) => {
   const { age } = req.body;
   if (!age) {
     return next({ statusCode: 400, message: 'O campo "age" é obrigatório' });
@@ -55,7 +55,7 @@ const postAgeValidation = (req, _res, next) => {
   }
 };
 
-const postWatchedValidation = (req, _res, next) => {
+const watchedValidation = (req, _res, next) => {
   const { watchedAt } = req.body.talk;
   const dateFormat = /^\d{2}\/\d{2}\/\d{4}$/;
   if (!watchedAt) {
@@ -69,7 +69,7 @@ const postWatchedValidation = (req, _res, next) => {
   }
 };
 
-const postRateValidation = (req, _res, next) => {
+const rateValidation = (req, _res, next) => {
   const { rate } = req.body.talk;
   if (rate === undefined) {
     return next({ statusCode: 400, message: 'O campo "rate" é obrigatório' });
@@ -82,26 +82,51 @@ const postRateValidation = (req, _res, next) => {
   }
 };
 
-const postTalkValidation = (req, _res, next) => {
+const talkValidation = (req, _res, next) => {
   const { talk } = req.body;
   if (!talk) {
     return next({ statusCode: 400, message: 'O campo "talk" é obrigatório' });
   }
-  postWatchedValidation(req, _res, next);
-  postRateValidation(req, _res, next);
+  watchedValidation(req, _res, next);
+  rateValidation(req, _res, next);
 };
 
-const postBodyValidation = (req, _res, next) => {
-  postNameValidation(req, _res, next);
-  postAgeValidation(req, _res, next);
-  postTalkValidation(req, _res, next);
+const bodyValidation = (req, _res, next) => {
+  nameValidation(req, _res, next);
+  ageValidation(req, _res, next);
+  talkValidation(req, _res, next);
+  next();
+};
+
+const watchedQueryValidation = (req, _res, next) => {
+  const { date } = req.query;
+  const dateFormat = /^\d{2}\/\d{2}\/\d{4}$/;
+  if (date && !dateFormat.test(date)) {
+    return next({ 
+      statusCode: 400, 
+      message: 'O parâmetro "date" deve ter o formato "dd/mm/aaaa"', 
+    });
+  }
+  next();
+};
+
+const rateQueryValidation = (req, _res, next) => {
+  const { rate } = req.query;
+  const rateN = Number(rate);
+  if (rate && (!Number.isInteger(rateN) || rateN < 1 || rateN > 5)) {
+    return next({ 
+      statusCode: 400, 
+      message: 'O campo "rate" deve ser um número inteiro entre 1 e 5', 
+    });
+  }
   next();
 };
 
 module.exports = {
   emailValidation,
   passwordValidation,
-  postHeaderValidation,
-  postBodyValidation,
-  
+  headerValidation,
+  bodyValidation,
+  watchedQueryValidation,
+  rateQueryValidation,
 };

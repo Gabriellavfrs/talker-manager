@@ -30,10 +30,20 @@ const deleteTalker = async (id) => {
   return fs.writeFile('src/talker.json', JSON.stringify(newTalkersArray));
 };
 
+const filterByQueries = async (q, rate, date) => {
+  const talkersArray = await readTalkerFile();
+  const filteredTalkers = talkersArray.filter(({ name, talk }) => 
+  name.includes(q)
+  && (talk.rate.toString().includes(rate))
+  && (talk.watchedAt.includes(date)));
+  return filteredTalkers;
+};
+
 module.exports = {
   readTalkerFile,
   gettLastId,
   insertTalker,
   editTalker,
   deleteTalker,
+  filterByQueries,
 };

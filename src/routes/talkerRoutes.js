@@ -5,17 +5,24 @@ const utilsFile = require('../utils');
 const router = express.Router();
 
 const {   
-  postHeaderValidation,
-  postBodyValidation,
+  headerValidation,
+  bodyValidation,
+  watchedQueryValidation,
+  rateQueryValidation,
 } = require('../middlewares/validations');
 
-router.get('/search', postHeaderValidation, async (req, res) => {
-  const { q } = req.query;
+router.get('/search', headerValidation, watchedQueryValidation,
+rateQueryValidation, async (req, res) => {
+ const q = req.query.q || '';
+ const date = req.query.date || '';
+ const rate = req.query.rate || '';
+
   const talkersArray = await utilsFile.readTalkerFile();
-  if (!q) {
+  if (!Object.keys(req.query)) {
     return res.status(200).json(talkersArray);
   }
-  const filteredTalkers = talkersArray.filter(({ name }) => name.includes(q));
+  const filteredTalkers = await utilsFile.filterByQueries(q, rate, date);
+
   res.status(200).json(filteredTalkers);
 });
 
@@ -34,8 +41,8 @@ router.get('/:id', async (req, res, next) => {
   res.status(200).json(talkerById);
 });
 
-router.post('/', postHeaderValidation,
-postBodyValidation, async (req, res) => {
+router.post('/', headerValidation,
+bodyValidation, async (req, res) => {
   const lastId = await utilsFile.gettLastId();
   const newTalker = {
     id: lastId + 1,
@@ -45,7 +52,7 @@ postBodyValidation, async (req, res) => {
   res.status(201).json((newTalker));
 });
 
-router.put('/:id', postHeaderValidation, postBodyValidation, async (req, res, next) => {
+router.put('/:id', headerValidation, bodyValidation, async (req, res, next) => {
   const { id } = req.params;
   const talkersArray = await utilsFile.readTalkerFile();
   if (!talkersArray.find((t) => t.id === Number(id))) {
@@ -59,7 +66,7 @@ router.put('/:id', postHeaderValidation, postBodyValidation, async (req, res, ne
   res.status(200).json((editedTalker));
 });
 
-router.delete('/:id', postHeaderValidation, async (req, res) => {
+router.delete('/:id', headerValidation, async (req, res) => {
   const { id } = req.params;
   await utilsFile.deleteTalker(Number(id));
   res.sendStatus(204);
