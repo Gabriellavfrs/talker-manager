@@ -122,6 +122,20 @@ const rateQueryValidation = (req, _res, next) => {
   next();
 };
 
+const rateValidationToEdit = (req, _res, next) => {
+  const { rate } = req.body;
+  if (rate === undefined) {
+    return next({ statusCode: 400, message: 'O campo "rate" é obrigatório' });
+  }
+  if (!Number.isInteger(rate) || rate < 1 || rate > 5) {
+    return next({ 
+      statusCode: 400, 
+      message: 'O campo "rate" deve ser um número inteiro entre 1 e 5', 
+    });
+  }
+  next();
+};
+
 module.exports = {
   emailValidation,
   passwordValidation,
@@ -129,4 +143,5 @@ module.exports = {
   bodyValidation,
   watchedQueryValidation,
   rateQueryValidation,
+  rateValidationToEdit,
 };

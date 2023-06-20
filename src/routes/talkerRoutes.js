@@ -9,6 +9,7 @@ const {
   bodyValidation,
   watchedQueryValidation,
   rateQueryValidation,
+  rateValidationToEdit,
 } = require('../middlewares/validations');
 
 router.get('/search', headerValidation, watchedQueryValidation,
@@ -22,7 +23,6 @@ rateQueryValidation, async (req, res) => {
     return res.status(200).json(talkersArray);
   }
   const filteredTalkers = await utilsFile.filterByQueries(q, rate, date);
-
   res.status(200).json(filteredTalkers);
 });
 
@@ -69,6 +69,15 @@ router.put('/:id', headerValidation, bodyValidation, async (req, res, next) => {
 router.delete('/:id', headerValidation, async (req, res) => {
   const { id } = req.params;
   await utilsFile.deleteTalker(Number(id));
+  res.sendStatus(204);
+});
+
+router.patch('/rate/:id', headerValidation, rateValidationToEdit, async (req, res) => {
+  const { id } = req.params;
+  const talkersArray = await utilsFile.readTalkerFile();
+  const talkerInfo = talkersArray.find((t) => t.id === Number(id));
+  talkerInfo.talk.rate = req.body.rate;
+  await utilsFile.editTalker(talkerInfo);
   res.sendStatus(204);
 });
 
