@@ -5,6 +5,13 @@ const readTalkerFile = async () => {
   return JSON.parse(resultArray);
 };
 
+const gettLastId = async () => {
+  const resultArray = await readTalkerFile();
+  const lastId = resultArray[resultArray.length - 1];
+  return lastId.id;
+};
+
 module.exports = {
   readTalkerFile,
+  gettLastId,
 };
