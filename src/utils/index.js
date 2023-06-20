@@ -17,8 +17,16 @@ const insertTalker = async (talker) => {
   return fs.writeFile('src/talker.json', JSON.stringify(talkersArray));
 };
 
+const editTalker = async (editedTalker) => {
+  const talkersArray = await readTalkerFile();
+  const talkerIndex = talkersArray.findIndex((t) => t.id === editedTalker.id);
+  talkersArray[talkerIndex] = editedTalker;
+  return fs.writeFile('src/talker.json', JSON.stringify(talkersArray));
+};
+
 module.exports = {
   readTalkerFile,
   gettLastId,
   insertTalker,
+  editTalker,
 };
