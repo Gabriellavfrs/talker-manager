@@ -1,5 +1,7 @@
 const express = require('express');
 
+const talkerDB = require('../db/talkerDB');
+
 const utilsFile = require('../utils');
 
 const router = express.Router();
@@ -11,6 +13,11 @@ const {
   rateQueryValidation,
   rateValidationToEdit,
 } = require('../middlewares/validations');
+
+router.get('/db', async (req, res) => {
+  const talkers = await talkerDB.getAll();
+  return res.status(200).json(talkers);
+});
 
 router.get('/search', headerValidation, watchedQueryValidation,
 rateQueryValidation, async (req, res) => {
